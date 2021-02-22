@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlay,
@@ -6,6 +6,7 @@ import {
   faAngleRight,
   faPause,
 } from "@fortawesome/free-solid-svg-icons";
+import { playAudio } from "../util";
 
 const Player = ({
   setCurrentSong,
@@ -17,7 +18,25 @@ const Player = ({
   isPlaying,
   setIsPlaying,
   timeUpdateHandler,
+  setSongs,
 }) => {
+  //useEffect
+  useEffect(() => {
+    const newSongs = songs.map((song) => {
+      if (song.id === currentSong.id) {
+        return {
+          ...song,
+          active: true,
+        };
+      } else {
+        return {
+          ...song,
+          active: false,
+        };
+      }
+    });
+    setSongs(newSongs);
+  }, [currentSong]);
   //event handlers
   const playSongHandler = () => {
     if (isPlaying) {
@@ -51,15 +70,17 @@ const Player = ({
       console.log((currentId - 1) % songs.length);
       if ((currentId - 1) % songs.length === -1) {
         setCurrentSong(songs[songs.length - 1]);
+        playAudio(isPlaying, audioRef);
         return;
       }
       setCurrentSong(songs[(currentId - 1) % songs.length]);
     }
+    playAudio(isPlaying, audioRef);
   };
   return (
     <div className="player">
       <div className="time-control">
-        <p>{getTime(songInfo.currentTime)}</p>
+        <p>{songInfo.duration ? getTime(songInfo.currentTime) : "0:00"}</p>
         <input
           min={0}
           max={songInfo.duration || 0}
