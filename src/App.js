@@ -19,11 +19,21 @@ function App() {
   const [songInfo, setSongInfo] = useState({
     currentTime: 0,
     duration: 0,
+    animationPercentage: 0,
   });
   const timeUpdateHandler = (e) => {
     let currentTime = e.target.currentTime;
     let duration = e.target.duration;
-    setSongInfo({ ...songInfo, currentTime, duration });
+    //percentage calculation
+    let roundedCurrent = Math.round(currentTime);
+    let roundedDuration = Math.round(duration);
+    let percentage = Math.round((roundedCurrent / roundedDuration) * 100);
+    setSongInfo({
+      ...songInfo,
+      currentTime,
+      duration,
+      animationPercentage: percentage,
+    });
   };
   return (
     <div className="App">
