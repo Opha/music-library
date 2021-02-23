@@ -6,7 +6,6 @@ import {
   faAngleRight,
   faPause,
 } from "@fortawesome/free-solid-svg-icons";
-import { playAudio } from "../util";
 
 const Player = ({
   setCurrentSong,
@@ -60,38 +59,35 @@ const Player = ({
       currentTime: e.target.value,
     });
   };
-  const skipTrackHandler = (direction) => {
+  const skipTrackHandler = async (direction) => {
     let currentId = songs.findIndex((song) => song.id === currentSong.id);
     if (direction === "skip-forward") {
-      setCurrentSong(songs[(currentId + 1) % songs.length]);
-      console.log((currentId + 1) % songs.length);
+      await setCurrentSong(songs[(currentId + 1) % songs.length]);
     }
     if (direction === "skip-back") {
-      console.log((currentId - 1) % songs.length);
       if ((currentId - 1) % songs.length === -1) {
-        setCurrentSong(songs[songs.length - 1]);
-        playAudio(isPlaying, audioRef);
+        await setCurrentSong(songs[songs.length - 1]);
+        if (isPlaying) audioRef.current.play();
         return;
       }
-      setCurrentSong(songs[(currentId - 1) % songs.length]);
+      await setCurrentSong(songs[(currentId - 1) % songs.length]);
     }
-    playAudio(isPlaying, audioRef);
+    if (isPlaying) audioRef.current.play();
   };
+
   //styling
   const trackAnim = {
     transform: `translateX(${songInfo.animationPercentage}%)`,
+  };
+  const gradientStyle = {
+    background: `linear-gradient(to right, ${currentSong.color[0]}, ${currentSong.color[1]})`,
   };
   console.log(songInfo.animationPercentage);
   return (
     <div className="player">
       <div className="time-control">
         <p>{getTime(songInfo.currentTime)}</p>
-        <div
-          style={{
-            background: `linear-gradient(to right, ${currentSong.color[0]}, ${currentSong.color[1]})`,
-          }}
-          className="track"
-        >
+        <div style={gradientStyle} className="track">
           <input
             min={0}
             max={songInfo.duration || 0}
