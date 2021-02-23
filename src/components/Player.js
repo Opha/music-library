@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlay,
@@ -19,10 +19,9 @@ const Player = ({
   timeUpdateHandler,
   setSongs,
 }) => {
-  //useEffect
-  useEffect(() => {
+  const activeLibraryHandler = (nextPrev) => {
     const newSongs = songs.map((song) => {
-      if (song.id === currentSong.id) {
+      if (song.id === nextPrev.id) {
         return {
           ...song,
           active: true,
@@ -35,7 +34,7 @@ const Player = ({
       }
     });
     setSongs(newSongs);
-  }, [currentSong]);
+  };
   //event handlers
   const playSongHandler = () => {
     if (isPlaying) {
@@ -63,14 +62,17 @@ const Player = ({
     let currentId = songs.findIndex((song) => song.id === currentSong.id);
     if (direction === "skip-forward") {
       await setCurrentSong(songs[(currentId + 1) % songs.length]);
+      activeLibraryHandler(songs[(currentId + 1) % songs.length]);
     }
     if (direction === "skip-back") {
       if ((currentId - 1) % songs.length === -1) {
         await setCurrentSong(songs[songs.length - 1]);
+        activeLibraryHandler(songs[songs.length - 1]);
         if (isPlaying) audioRef.current.play();
         return;
       }
       await setCurrentSong(songs[(currentId - 1) % songs.length]);
+      activeLibraryHandler(songs[(currentId - 1) % songs.length]);
     }
     if (isPlaying) audioRef.current.play();
   };
@@ -82,7 +84,6 @@ const Player = ({
   const gradientStyle = {
     background: `linear-gradient(to right, ${currentSong.color[0]}, ${currentSong.color[1]})`,
   };
-  console.log(songInfo.animationPercentage);
   return (
     <div className="player">
       <div className="time-control">
